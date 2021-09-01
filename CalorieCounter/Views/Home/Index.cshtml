@@ -1,0 +1,178 @@
+﻿@model IndexModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+<section>
+    <b>Use the calorie checker to look up the calories of more than<br /> 2000 different foods and drinks quickly and simply.</b>
+</section>
+<section>
+    <div class="genel" id="genel">
+        <h1 style="color:white">Calorie checker</h1>
+        <div class="mainplace" id="mainspace">
+            <p>Check the calories in over 2000 different food and drinks. Just type the product name below.</p>
+            <div class="search">
+                <div class="search-box">
+                    <i class="fa fa-search" id="searchicon"></i>
+                    <input type="text" id="searchbox" placeholder="e.g noodles" />
+                </div>
+                @{
+                    if (Model != null)
+                    {
+                        int i = 1;
+                        foreach (var item in Model.SearchResults)
+                        {
+                            string idinput = "input-" + i.ToString();
+                            <details id="@(idinput.Replace("input","details"))" onclick="opendetails('@i')">
+                                <summary class="summary">@(i.ToString() + "." + item.Display_Name)</summary>
+                                <h6 class="quantity-header">Quantity</h6>
+                                <h6 class="serving-header">Serving size</h6>
+                                <h6 class="kcal-header">kcal</h6>
+                                <h6 class="fat-header">Fat(g)</h6>
+                                <br />
+                                <input type="number" min="1" max="20" value="1" id="@idinput" onchange="changeresult('@i', '@item.Calories','@(item.Solid_Fats+item.Saturated_Fats)')" class="quantity" />
+                                <p class="serving">@item.Portion_Display_Name.Replace(item.Portion_Display_Name.First().ToString(), item.Portion_Display_Name.First().ToString().ToUpper())</p>
+                                <p id="@(idinput.Replace("input","result"))" class="kcal">@string.Format("{0:0.00}", item.Calories)</p>
+                                <p id="@(idinput.Replace("input","fat-result"))" class="fat">@string.Format("{0:0.00}", (item.Solid_Fats + item.Saturated_Fats))</p>
+                            </details>
+                            i++;
+                        }
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    function Open() {
+    }
+    var input = document.getElementById("searchbox");
+    input.addEventListener("keyup", function (event) {
+        if (event.keyCode == 13) {
+            if (input.value.length>2) {
+                event.preventDefault();
+                window.location.href = "https://localhost:44337/" + input.value;
+            }
+            else {
+                alert('adda');
+            }
+        }
+    });
+
+    function opendetails(val) {
+        var detailselement = document.getElementById("details-" + Number(val).toString());
+        if (detailselement.open == false) {
+            detailselement.children[0].className = "summary-open";
+        }
+        else {
+            detailselement.children[0].className = "summary";
+            detailselement.children[0].style.backgroundColor = "";
+        }
+    }
+    function changeresult(ıd, calorie,fat) {
+        var resultıd = "result-" + Number(ıd).toString();
+        var inputıd = resultıd.replace("result", "input");
+        var inputvalue = document.getElementById(inputıd).value;
+        var kcalnum = Number(inputvalue).toFixed(2) * Number(calorie).toFixed(2);
+        var fatnum = Number(inputvalue).toFixed(2) * Number(fat).toFixed(2);
+        document.getElementById(resultıd).innerHTML = kcalnum.toFixed(2).toString();
+        resultıd = resultıd.replace("result", "fat-result");
+        document.getElementById(resultıd).innerHTML = fatnum.toFixed(2).toString();
+    }
+</script>
+<style type="text/css">
+        span.disable-links {
+            pointer-events: none;
+        }
+        .search-box{
+            border-radius: 5px;
+            border-style:solid;
+            margin-bottom:25px;
+        }
+        #searchicon{
+            margin-left:5px;
+            margin-top:5px;
+            font-size:40px;
+            color:lightskyblue;
+        }
+        .search {
+            width: 410px;
+        }
+        input#searchbox{
+            margin-left:10px;
+            border-style:none;
+            width:345px;
+            height:50px;
+        }
+        #searchbox:focus{
+            outline:none;
+        }
+        .genel {
+            width: 455px;
+            background-color: blue;
+        }
+
+        .mainplace {
+            background-color: white;
+            border: 3px solid blue;
+            padding-left: 1px;
+        }
+
+        summary.summary:hover {
+            color: blueviolet;
+            text-decoration: underline;
+        }
+
+        summary.summary-open {
+            background-color: yellow;
+        }
+
+        .quantity {
+            display: inline-block;
+            width: 48.59px;
+            height: 40.03px;
+        }
+
+        .serving {
+            display: inline-block;
+            margin-left: 20px;
+            width: 163.92px;
+        }
+
+        .kcal {
+            display: inline-block;
+            width: 61.47px;
+        }
+
+        .fat {
+            display: inline-block;
+        }
+
+        .quantity-header {
+            display: inline-block;
+            width: 70px;
+        }
+
+        .serving-header {
+            display: inline-block;
+            width: 163.92px
+        }
+
+        .kcal-header {
+            display: inline-block;
+            width: 61.47px;
+        }
+
+        .fat-header {
+            display: inline-block;
+        }
+         details[open] > *:not(summary) {
+            animation: details-show .5s ease-in-out;
+         }
+         @@keyframes details-show {
+            from {
+                opacity: 0;
+                transform: var(--details-translate, translateY(-0.5em));
+            }
+         }
+</style>
